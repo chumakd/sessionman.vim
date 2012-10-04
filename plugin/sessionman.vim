@@ -220,9 +220,7 @@ function! s:ListSessions()
 	put =''
 	let l = line(".")
 
-	let sessions = substitute(glob(g:sessions_path . '/*'), '\\', '/', 'g')
-	let sessions = substitute(sessions, "\\(^\\|\n\\)" . g:sessions_path . '/', '\1', 'g')
-	let sessions = substitute(sessions, "\n[^\n]\\+x\\.vim\n", '\n', 'g')
+	let sessions = GetSessionListString()
 	if sessions == ''
 		syn match Error "^\" There.*"
 		let sessions = '" There are no saved sessions'
@@ -235,6 +233,12 @@ function! s:ListSessions()
 	setlocal nospell
 endfunction
 
+function! GetSessionListString()
+	let sessions = substitute(glob(g:sessions_path . '/*'), '\\', '/', 'g')
+	let sessions = substitute(sessions, "\\(^\\|\n\\)" . g:sessions_path . '/', '\1', 'g')
+	let sessions = substitute(sessions, "\n[^\n]\\+x\\.vim\n", '\n', 'g')
+	return sessions
+endfunction
 "============================================================================"
 
 function! s:SaveSessionAs(...)
