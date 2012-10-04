@@ -288,6 +288,8 @@ command! -nargs=0 SessionSave call s:SaveSession()
 command! -nargs=? SessionSaveAs call s:SaveSessionAs(<f-args>)
 command! -nargs=0 SessionShowLast call s:ShowLastSession()
 
+command! CtrlPSession call ctrlp#init(sessionman#ctrlp#id())
+
 "============================================================================"
 
 an 10.370 &File.-SessionsSep-				<Nop>
