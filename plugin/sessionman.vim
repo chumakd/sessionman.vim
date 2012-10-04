@@ -83,11 +83,13 @@ endif
 let s:cpo_save = &cpo
 set cpo&vim
 
-if has("win32") || has("dos32") || has("dos16") || has("os2")
-	let s:sessions_path = ($HOME != '') ? $HOME . '/vimfiles' : ($APPDATA != '') ? $APPDATA . '/Vim' : $VIM
-	let s:sessions_path = substitute(s:sessions_path, '\\', '/', 'g') . '/sessions'
-else
-	let s:sessions_path = $HOME . '/.vim/sessions'
+if !exists('g:sessions_path')
+	if has("win32") || has("dos32") || has("dos16") || has("os2")
+		let g:sessions_path = ($HOME != '') ? $HOME . '/vimfiles' : ($APPDATA != '') ? $APPDATA . '/Vim' : $VIM
+		let g:sessions_path = substitute(g:sessions_path, '\\', '/', 'g') . '/sessions'
+	else
+		let g:sessions_path = $HOME . '/.vim/sessions'
+	endif
 endif
 
 let s:et_save = &et
@@ -114,7 +116,7 @@ function! s:OpenSession(name)
 			set eventignore=all
 			execute 'silent! 1,' . bufnr('$') . 'bwipeout!'
 			let n = bufnr('%')
-			execute 'silent! so ' . s:sessions_path . '/' . a:name
+			execute 'silent! so ' . g:sessions_path . '/' . a:name
 			execute 'silent! bwipeout! ' . n
 		finally
 			set eventignore=
@@ -154,7 +156,7 @@ function! s:DeleteSession(name)
 			setlocal modifiable
 			d
 			setlocal nomodifiable
-			if delete(s:sessions_path . '/' . a:name) != 0
+			if delete(g:sessions_path . '/' . a:name) != 0
 				redraw | echohl ErrorMsg | echo 'Error deleting "' . a:name . '" session file' | echohl None
 			endif
 		endif
@@ -167,7 +169,7 @@ endfunction
 function! s:EditSession(name)
 	if a:name != '' && a:name[0] != '"'
 		bwipeout!
-		execute 'silent! edit ' . s:sessions_path . '/' . a:name
+		execute 'silent! edit ' . g:sessions_path . '/' . a:name
 		set ft=vim
 	endif
 endfunction
@@ -178,7 +180,7 @@ function! s:EditSessionExtra(name)
 	if a:name != '' && a:name[0] != '"'
 		bwipeout!
 		let n = substitute(a:name, "\\.[^.]*$", '', '')
-		execute 'silent! edit ' . s:sessions_path . '/' . n . 'x.vim'
+		execute 'silent! edit ' . g:sessions_path . '/' . n . 'x.vim'
 	endif
 endfunction
 
@@ -218,8 +220,8 @@ function! s:ListSessions()
 	put =''
 	let l = line(".")
 
-	let sessions = substitute(glob(s:sessions_path . '/*'), '\\', '/', 'g')
-	let sessions = substitute(sessions, "\\(^\\|\n\\)" . s:sessions_path . '/', '\1', 'g')
+	let sessions = substitute(glob(g:sessions_path . '/*'), '\\', '/', 'g')
+	let sessions = substitute(sessions, "\\(^\\|\n\\)" . g:sessions_path . '/', '\1', 'g')
 	let sessions = substitute(sessions, "\n[^\n]\\+x\\.vim\n", '\n', 'g')
 	if sessions == ''
 		syn match Error "^\" There.*"
@@ -242,12 +244,12 @@ function! s:SaveSessionAs(...)
 		let name = a:1
 	endif
 	if name != ''
-		if v:version >= 700 && finddir(s:sessions_path, '/') == ''
-			call mkdir(s:sessions_path, 'p')
+		if v:version >= 700 && finddir(g:sessions_path, '/') == ''
+			call mkdir(g:sessions_path, 'p')
 		endif
 		silent! argdel *
 		let g:LAST_SESSION = name
-		execute 'silent mksession! ' . s:sessions_path . '/' . name
+		execute 'silent mksession! ' . g:sessions_path . '/' . name
 		redraw | echo 'Saved session "' . name . '"'
 	endif
 endfunction
@@ -272,8 +274,8 @@ endfunction
 "============================================================================"
 
 function! s:SessionOpenComplete(A, L, P)
-	let sessions = substitute(glob(s:sessions_path . '/*'), '\\', '/', 'g')
-	return substitute(sessions, '\(^\|\n\)' . s:sessions_path . '/', '\1', 'g')
+	let sessions = substitute(glob(g:sessions_path . '/*'), '\\', '/', 'g')
+	return substitute(sessions, '\(^\|\n\)' . g:sessions_path . '/', '\1', 'g')
 endfunction
 
 "============================================================================"
