@@ -113,19 +113,19 @@ function! s:OpenSession(name)
 			silent! cscope kill -1
 		endif
 		try
-			set eventignore=all
+			" set eventignore=all
 			execute 'silent! 1,' . bufnr('$') . 'bwipeout!'
 			let n = bufnr('%')
 			execute 'silent! so ' . g:sessions_path . '/' . a:name
 			execute 'silent! bwipeout! ' . n
 		finally
-			set eventignore=
-			doautoall BufRead
-			doautoall FileType
-			doautoall BufEnter
-			doautoall BufWinEnter
-			doautoall TabEnter
-			doautoall SessionLoadPost
+			" set eventignore=
+			" doautoall BufRead *
+			" doautoall FileType
+			" doautoall BufEnter
+			" doautoall BufWinEnter
+			" doautoall TabEnter
+			" doautoall SessionLoadPost
 		endtry
 		if has('cscope')
 			silent! cscope add .
